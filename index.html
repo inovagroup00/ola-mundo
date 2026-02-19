@@ -685,7 +685,7 @@
     </div>
 
     <script>
-        const GAMMA_API = 'https://gamma-api.polymarket.com';
+        const API_PROXY = '/api/polymarket';
         const POLYMARKET_BASE = 'https://polymarket.com/event';
 
         let allEvents = [];
@@ -700,7 +700,7 @@
 
             // Fetch open events
             while (hasMore) {
-                const url = `${GAMMA_API}/events?` + new URLSearchParams({
+                const url = `${API_PROXY}?` + new URLSearchParams({
                     tag: 'weather',
                     limit: limit.toString(),
                     offset: offset.toString(),
@@ -734,7 +734,7 @@
 
             // Also fetch recently closed events
             try {
-                const closedUrl = `${GAMMA_API}/events?` + new URLSearchParams({
+                const closedUrl = `${API_PROXY}?` + new URLSearchParams({
                     tag: 'weather',
                     closed: 'true',
                     limit: '100',
