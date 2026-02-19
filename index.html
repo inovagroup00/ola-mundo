@@ -3,9 +3,1100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Olá Mundo</title>
+    <title>Polymarket - Temperatura SP</title>
+    <style>
+        :root {
+            --bg-primary: #0d1117;
+            --bg-secondary: #161b22;
+            --bg-card: #1c2333;
+            --bg-card-hover: #222d3f;
+            --border: #30363d;
+            --text-primary: #e6edf3;
+            --text-secondary: #8b949e;
+            --accent: #58a6ff;
+            --accent-hover: #79b8ff;
+            --green: #3fb950;
+            --green-bg: rgba(63, 185, 80, 0.12);
+            --red: #f85149;
+            --red-bg: rgba(248, 81, 73, 0.12);
+            --yellow: #d29922;
+            --yellow-bg: rgba(210, 153, 34, 0.12);
+            --purple: #bc8cff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 24px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .logo span {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 14px;
+            margin-left: 8px;
+        }
+
+        .status-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            background: var(--bg-card);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.error {
+            background: var(--red);
+            animation: none;
+        }
+
+        .status-dot.loading {
+            background: var(--yellow);
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .refresh-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .refresh-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent);
+        }
+
+        .refresh-btn.spinning svg {
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .auto-refresh-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .toggle {
+            width: 36px;
+            height: 20px;
+            background: var(--border);
+            border-radius: 10px;
+            position: relative;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle.active {
+            background: var(--accent);
+        }
+
+        .toggle::after {
+            content: '';
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transition: transform 0.3s;
+        }
+
+        .toggle.active::after {
+            transform: translateX(16px);
+        }
+
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .stat-sub {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        select, input[type="text"] {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 13px;
+            outline: none;
+        }
+
+        select:focus, input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .section-title .count {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            font-weight: 400;
+        }
+
+        .events-grid {
+            display: grid;
+            gap: 16px;
+        }
+
+        .event-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            overflow: hidden;
+            transition: border-color 0.2s;
+        }
+
+        .event-card:hover {
+            border-color: var(--accent);
+        }
+
+        .event-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .event-title {
+            font-size: 15px;
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .event-title a {
+            color: var(--text-primary);
+            text-decoration: none;
+        }
+
+        .event-title a:hover {
+            color: var(--accent);
+        }
+
+        .event-meta {
+            display: flex;
+            gap: 12px;
+            margin-top: 6px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .event-tag {
+            background: var(--yellow-bg);
+            color: var(--yellow);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .event-status {
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .event-status.active {
+            background: var(--green-bg);
+            color: var(--green);
+        }
+
+        .event-status.closed {
+            background: var(--red-bg);
+            color: var(--red);
+        }
+
+        .markets-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .markets-table th {
+            text-align: left;
+            padding: 8px 20px;
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: rgba(0,0,0,0.2);
+        }
+
+        .markets-table td {
+            padding: 10px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid rgba(48, 54, 61, 0.4);
+        }
+
+        .markets-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .markets-table tr:hover td {
+            background: rgba(88, 166, 255, 0.04);
+        }
+
+        .outcome-name {
+            font-weight: 500;
+        }
+
+        .price-cell {
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .prob-bar-container {
+            width: 100px;
+            height: 6px;
+            background: var(--border);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .prob-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 0.5s ease;
+        }
+
+        .prob-bar.high { background: var(--green); }
+        .prob-bar.medium { background: var(--yellow); }
+        .prob-bar.low { background: var(--red); }
+
+        .volume-cell {
+            color: var(--text-secondary);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 80px 20px;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--border);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin-bottom: 16px;
+        }
+
+        .error-container {
+            background: var(--red-bg);
+            border: 1px solid rgba(248, 81, 73, 0.3);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .error-container h3 {
+            color: var(--red);
+            margin-bottom: 8px;
+        }
+
+        .error-container p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .error-container button {
+            margin-top: 12px;
+            background: var(--red);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+
+        .last-update {
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .highlight {
+            color: var(--accent);
+        }
+
+        .temp-icon {
+            display: inline-block;
+            width: 18px;
+            height: 18px;
+            vertical-align: middle;
+        }
+
+        .polymarket-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 12px;
+        }
+
+        .polymarket-link:hover {
+            text-decoration: underline;
+        }
+
+        .chart-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .chart-bars {
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+            height: 150px;
+            padding: 0 4px;
+        }
+
+        .chart-bar-wrapper {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100%;
+            justify-content: flex-end;
+            min-width: 0;
+        }
+
+        .chart-bar-value {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
+            white-space: nowrap;
+        }
+
+        .chart-bar {
+            width: 100%;
+            max-width: 40px;
+            border-radius: 3px 3px 0 0;
+            transition: height 0.5s ease;
+            min-height: 2px;
+        }
+
+        .chart-bar-label {
+            font-size: 10px;
+            color: var(--text-secondary);
+            margin-top: 6px;
+            text-align: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 100%;
+        }
+
+        .footer {
+            max-width: 1200px;
+            margin: 40px auto 20px;
+            padding: 0 24px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+            .main {
+                padding: 16px;
+            }
+            .markets-table th:nth-child(4),
+            .markets-table td:nth-child(4) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Olá meu amigo!</h1>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    Polymarket SP
+                    <span>Temperatura Maxima</span>
+                </div>
+                <div class="status-badge" id="statusBadge">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Conectando...</span>
+                </div>
+            </div>
+            <div class="header-right">
+                <div class="last-update" id="lastUpdate"></div>
+                <div class="auto-refresh-toggle">
+                    <span>Auto (60s)</span>
+                    <div class="toggle active" id="autoRefreshToggle" onclick="toggleAutoRefresh()"></div>
+                </div>
+                <button class="refresh-btn" id="refreshBtn" onclick="loadData()">
+                    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.418A6 6 0 1 1 8 2v1z"/>
+                        <path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/>
+                    </svg>
+                    Atualizar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="main">
+        <div class="stats-row" id="statsRow">
+            <div class="stat-card">
+                <div class="stat-label">Mercados Encontrados</div>
+                <div class="stat-value" id="statTotal">--</div>
+                <div class="stat-sub">Eventos de temperatura SP</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Mercados Ativos</div>
+                <div class="stat-value highlight" id="statActive">--</div>
+                <div class="stat-sub">Abertos para apostas</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Volume Total</div>
+                <div class="stat-value" id="statVolume">--</div>
+                <div class="stat-sub">USD negociado</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Liquidez Total</div>
+                <div class="stat-value" id="statLiquidity">--</div>
+                <div class="stat-sub">USD disponivel</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <div class="filter-group">
+                <label class="filter-label">Status:</label>
+                <select id="filterStatus" onchange="renderEvents()">
+                    <option value="all">Todos</option>
+                    <option value="active" selected>Ativos</option>
+                    <option value="closed">Encerrados</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Ordenar:</label>
+                <select id="filterSort" onchange="renderEvents()">
+                    <option value="date_desc">Data (mais recente)</option>
+                    <option value="date_asc">Data (mais antigo)</option>
+                    <option value="volume">Maior volume</option>
+                    <option value="liquidity">Maior liquidez</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label class="filter-label">Buscar:</label>
+                <input type="text" id="filterSearch" placeholder="Ex: february 20" oninput="renderEvents()">
+            </div>
+        </div>
+
+        <div id="content">
+            <div class="loading-container">
+                <div class="spinner"></div>
+                <p>Carregando mercados da Polymarket...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="footer">
+        Dados fornecidos pela <a href="https://polymarket.com/predictions/weather" target="_blank">Polymarket API</a>.
+        Precos representam probabilidades do mercado. Atualizado em tempo real.
+    </div>
+
+    <script>
+        const GAMMA_API = 'https://gamma-api.polymarket.com';
+        const POLYMARKET_BASE = 'https://polymarket.com/event';
+
+        let allEvents = [];
+        let autoRefreshInterval = null;
+        let autoRefreshEnabled = true;
+
+        async function fetchSaoPauloEvents() {
+            const events = [];
+            let offset = 0;
+            const limit = 50;
+            let hasMore = true;
+
+            // Fetch open events
+            while (hasMore) {
+                const url = `${GAMMA_API}/events?` + new URLSearchParams({
+                    tag: 'weather',
+                    limit: limit.toString(),
+                    offset: offset.toString(),
+                    order: 'id',
+                    ascending: 'false'
+                });
+
+                const resp = await fetch(url);
+                if (!resp.ok) throw new Error(`API retornou status ${resp.status}`);
+                const data = await resp.json();
+
+                if (!Array.isArray(data) || data.length === 0) {
+                    hasMore = false;
+                    break;
+                }
+
+                const spEvents = data.filter(e =>
+                    e.title && e.title.toLowerCase().includes('sao paulo')
+                );
+                events.push(...spEvents);
+
+                // If we got fewer events that don't match SP and we've checked enough, stop
+                if (data.length < limit) {
+                    hasMore = false;
+                } else {
+                    offset += limit;
+                    // Safety limit: don't paginate too far
+                    if (offset > 500) hasMore = false;
+                }
+            }
+
+            // Also fetch recently closed events
+            try {
+                const closedUrl = `${GAMMA_API}/events?` + new URLSearchParams({
+                    tag: 'weather',
+                    closed: 'true',
+                    limit: '100',
+                    offset: '0',
+                    order: 'id',
+                    ascending: 'false'
+                });
+                const closedResp = await fetch(closedUrl);
+                if (closedResp.ok) {
+                    const closedData = await closedResp.json();
+                    if (Array.isArray(closedData)) {
+                        const closedSP = closedData.filter(e =>
+                            e.title && e.title.toLowerCase().includes('sao paulo')
+                        );
+                        events.push(...closedSP);
+                    }
+                }
+            } catch (e) {
+                console.warn('Erro ao buscar eventos encerrados:', e);
+            }
+
+            // Deduplicate by ID
+            const seen = new Set();
+            return events.filter(e => {
+                if (seen.has(e.id)) return false;
+                seen.add(e.id);
+                return true;
+            });
+        }
+
+        function parseEventDate(event) {
+            // Try to extract date from title like "Highest temperature in Sao Paulo on February 17?"
+            const match = event.title && event.title.match(/on\s+(\w+\s+\d+)/i);
+            if (match) {
+                const year = event.endDate
+                    ? new Date(event.endDate).getFullYear()
+                    : new Date().getFullYear();
+                const parsed = new Date(`${match[1]}, ${year}`);
+                if (!isNaN(parsed)) return parsed;
+            }
+            if (event.endDate) return new Date(event.endDate);
+            return new Date(0);
+        }
+
+        function formatCurrency(value) {
+            const num = parseFloat(value) || 0;
+            if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+            if (num >= 1000) return `$${(num / 1000).toFixed(1)}K`;
+            return `$${num.toFixed(0)}`;
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return '--';
+            const d = new Date(dateStr);
+            return d.toLocaleDateString('pt-BR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            });
+        }
+
+        function getOutcomesFromMarkets(markets) {
+            if (!markets || !Array.isArray(markets)) return [];
+            return markets.map(m => {
+                const outcomePrices = {};
+                try {
+                    const prices = JSON.parse(m.outcomePrices || '[]');
+                    const outcomes = JSON.parse(m.outcomes || '[]');
+                    outcomes.forEach((name, i) => {
+                        outcomePrices[name] = parseFloat(prices[i]) || 0;
+                    });
+                } catch (e) {}
+
+                return {
+                    id: m.id,
+                    question: m.question || m.groupItemTitle || '',
+                    outcomePrices,
+                    volume: parseFloat(m.volume) || 0,
+                    liquidity: parseFloat(m.liquidity) || 0,
+                    active: m.active,
+                    closed: m.closed,
+                    conditionId: m.conditionId
+                };
+            });
+        }
+
+        function updateStats() {
+            const active = allEvents.filter(e => e.active && !e.closed);
+            const totalVolume = allEvents.reduce((sum, e) => {
+                const markets = e.markets || [];
+                return sum + markets.reduce((s, m) => s + (parseFloat(m.volume) || 0), 0);
+            }, 0);
+            const totalLiquidity = allEvents.reduce((sum, e) => {
+                const markets = e.markets || [];
+                return sum + markets.reduce((s, m) => s + (parseFloat(m.liquidity) || 0), 0);
+            }, 0);
+
+            document.getElementById('statTotal').textContent = allEvents.length;
+            document.getElementById('statActive').textContent = active.length;
+            document.getElementById('statVolume').textContent = formatCurrency(totalVolume);
+            document.getElementById('statLiquidity').textContent = formatCurrency(totalLiquidity);
+        }
+
+        function renderEvents() {
+            const container = document.getElementById('content');
+            const filterStatus = document.getElementById('filterStatus').value;
+            const filterSort = document.getElementById('filterSort').value;
+            const filterSearch = document.getElementById('filterSearch').value.toLowerCase();
+
+            let events = [...allEvents];
+
+            // Filter by status
+            if (filterStatus === 'active') {
+                events = events.filter(e => e.active && !e.closed);
+            } else if (filterStatus === 'closed') {
+                events = events.filter(e => e.closed);
+            }
+
+            // Filter by search
+            if (filterSearch) {
+                events = events.filter(e =>
+                    (e.title || '').toLowerCase().includes(filterSearch) ||
+                    (e.slug || '').toLowerCase().includes(filterSearch)
+                );
+            }
+
+            // Sort
+            events.sort((a, b) => {
+                switch (filterSort) {
+                    case 'date_desc': return parseEventDate(b) - parseEventDate(a);
+                    case 'date_asc': return parseEventDate(a) - parseEventDate(b);
+                    case 'volume': {
+                        const va = (a.markets || []).reduce((s, m) => s + (parseFloat(m.volume) || 0), 0);
+                        const vb = (b.markets || []).reduce((s, m) => s + (parseFloat(m.volume) || 0), 0);
+                        return vb - va;
+                    }
+                    case 'liquidity': {
+                        const la = (a.markets || []).reduce((s, m) => s + (parseFloat(m.liquidity) || 0), 0);
+                        const lb = (b.markets || []).reduce((s, m) => s + (parseFloat(m.liquidity) || 0), 0);
+                        return lb - la;
+                    }
+                    default: return 0;
+                }
+            });
+
+            if (events.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Nenhum mercado encontrado</h3>
+                        <p>Tente ajustar os filtros ou aguarde novos mercados serem criados na Polymarket.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sectionTitle = `
+                <div class="section-title">
+                    Mercados de Temperatura - Sao Paulo
+                    <span class="count">${events.length}</span>
+                </div>
+            `;
+
+            // Build chart for the first active event with markets
+            let chartHtml = '';
+            const chartEvent = events.find(e => e.markets && e.markets.length > 0);
+            if (chartEvent) {
+                chartHtml = buildChart(chartEvent);
+            }
+
+            const eventsHtml = events.map(event => {
+                const isActive = event.active && !event.closed;
+                const outcomes = getOutcomesFromMarkets(event.markets);
+                const eventDate = parseEventDate(event);
+                const dateStr = eventDate.getTime() > 0
+                    ? eventDate.toLocaleDateString('pt-BR', { day: '2-digit', month: 'long', year: 'numeric' })
+                    : '';
+                const slug = event.slug || '';
+                const polyUrl = `${POLYMARKET_BASE}/${slug}`;
+
+                let marketsHtml = '';
+                if (outcomes.length > 0) {
+                    const sortedOutcomes = outcomes
+                        .map(o => {
+                            const yesPrice = o.outcomePrices['Yes'] || 0;
+                            return { ...o, yesPrice };
+                        })
+                        .sort((a, b) => b.yesPrice - a.yesPrice);
+
+                    const rows = sortedOutcomes.map(o => {
+                        const prob = (o.yesPrice * 100).toFixed(1);
+                        const probNum = parseFloat(prob);
+                        const barClass = probNum >= 30 ? 'high' : probNum >= 10 ? 'medium' : 'low';
+                        const displayName = o.question
+                            .replace(/highest temperature in sao paulo on \w+ \d+\??/i, '')
+                            .replace(/^\s*[-:]\s*/, '')
+                            .trim() || o.question;
+
+                        return `
+                            <tr>
+                                <td class="outcome-name">${escapeHtml(displayName)}</td>
+                                <td class="price-cell">${prob}%</td>
+                                <td>
+                                    <div class="prob-bar-container">
+                                        <div class="prob-bar ${barClass}" style="width: ${prob}%"></div>
+                                    </div>
+                                </td>
+                                <td class="volume-cell">${formatCurrency(o.volume)}</td>
+                            </tr>
+                        `;
+                    }).join('');
+
+                    marketsHtml = `
+                        <table class="markets-table">
+                            <thead>
+                                <tr>
+                                    <th>Faixa de Temperatura</th>
+                                    <th>Probabilidade</th>
+                                    <th>Grafico</th>
+                                    <th>Volume</th>
+                                </tr>
+                            </thead>
+                            <tbody>${rows}</tbody>
+                        </table>
+                    `;
+                }
+
+                return `
+                    <div class="event-card">
+                        <div class="event-header">
+                            <div>
+                                <div class="event-title">
+                                    <a href="${polyUrl}" target="_blank">${escapeHtml(event.title || 'Sem titulo')}</a>
+                                </div>
+                                <div class="event-meta">
+                                    <span>${dateStr}</span>
+                                    <span class="event-tag">Temperatura</span>
+                                    <a class="polymarket-link" href="${polyUrl}" target="_blank">Ver na Polymarket</a>
+                                </div>
+                            </div>
+                            <span class="event-status ${isActive ? 'active' : 'closed'}">
+                                ${isActive ? 'Ativo' : 'Encerrado'}
+                            </span>
+                        </div>
+                        ${marketsHtml}
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = sectionTitle + chartHtml + `<div class="events-grid">${eventsHtml}</div>`;
+        }
+
+        function buildChart(event) {
+            const outcomes = getOutcomesFromMarkets(event.markets);
+            if (outcomes.length === 0) return '';
+
+            const items = outcomes
+                .map(o => {
+                    const yesPrice = o.outcomePrices['Yes'] || 0;
+                    const label = o.question
+                        .replace(/highest temperature in sao paulo on \w+ \d+\??/i, '')
+                        .replace(/^\s*[-:]\s*/, '')
+                        .trim() || o.question;
+                    return { label, prob: yesPrice * 100 };
+                })
+                .sort((a, b) => {
+                    // Try to sort by temperature range
+                    const numA = parseFloat(a.label) || 0;
+                    const numB = parseFloat(b.label) || 0;
+                    return numA - numB;
+                });
+
+            const maxProb = Math.max(...items.map(i => i.prob), 1);
+
+            const bars = items.map(item => {
+                const height = Math.max((item.prob / maxProb) * 130, 2);
+                const color = item.prob >= 30 ? 'var(--green)' :
+                              item.prob >= 10 ? 'var(--yellow)' : 'var(--red)';
+                return `
+                    <div class="chart-bar-wrapper">
+                        <div class="chart-bar-value">${item.prob.toFixed(0)}%</div>
+                        <div class="chart-bar" style="height: ${height}px; background: ${color};"></div>
+                        <div class="chart-bar-label">${escapeHtml(item.label)}</div>
+                    </div>
+                `;
+            }).join('');
+
+            return `
+                <div class="chart-container">
+                    <div class="chart-title">Distribuicao de Probabilidades - ${escapeHtml(event.title || '')}</div>
+                    <div class="chart-bars">${bars}</div>
+                </div>
+            `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function setStatus(state, message) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+            dot.className = 'status-dot ' + (state === 'ok' ? '' : state);
+            text.textContent = message;
+        }
+
+        async function loadData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.classList.add('spinning');
+            setStatus('loading', 'Carregando...');
+
+            try {
+                allEvents = await fetchSaoPauloEvents();
+                updateStats();
+                renderEvents();
+                setStatus('ok', 'Conectado');
+                document.getElementById('lastUpdate').textContent =
+                    'Atualizado: ' + new Date().toLocaleTimeString('pt-BR');
+            } catch (err) {
+                console.error('Erro ao carregar dados:', err);
+                setStatus('error', 'Erro');
+                document.getElementById('content').innerHTML = `
+                    <div class="error-container">
+                        <h3>Erro ao carregar dados</h3>
+                        <p>${escapeHtml(err.message)}</p>
+                        <p>Verifique sua conexao com a internet e tente novamente.</p>
+                        <button onclick="loadData()">Tentar novamente</button>
+                    </div>
+                `;
+            } finally {
+                btn.classList.remove('spinning');
+            }
+        }
+
+        function toggleAutoRefresh() {
+            const toggle = document.getElementById('autoRefreshToggle');
+            autoRefreshEnabled = !autoRefreshEnabled;
+            toggle.classList.toggle('active', autoRefreshEnabled);
+
+            if (autoRefreshEnabled) {
+                startAutoRefresh();
+            } else {
+                stopAutoRefresh();
+            }
+        }
+
+        function startAutoRefresh() {
+            stopAutoRefresh();
+            autoRefreshInterval = setInterval(loadData, 60000);
+        }
+
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
+            }
+        }
+
+        // Initialize
+        loadData();
+        startAutoRefresh();
+    </script>
 </body>
 </html>
